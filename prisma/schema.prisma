@@ -1,0 +1,619 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model ATAXCARD {
+  FR_YM       String   @db.NVarChar(6)
+  TO_YM       String   @db.NVarChar(6)
+  CO_CD       String   @db.NVarChar(4)
+  DIV_CD      String   @db.NVarChar(4)
+  CARD_FG     String   @db.NVarChar(1)
+  CARD_SQ     Decimal  @db.Decimal(5, 0)
+  RPT_TM      String   @db.NVarChar(1)
+  TR_CARD     String?  @db.NVarChar(3)
+  TR_CARD_NM  String?  @db.NVarChar(30)
+  TR_CD       String?  @db.NVarChar(10)
+  TR_NM       String?  @db.NVarChar(40)
+  REG_NB      String?  @db.NVarChar(100)
+  ISS_DT      String?  @db.NVarChar(8)
+  SUP_AM      Decimal? @db.Decimal(17, 4)
+  VAT_AM      Decimal? @db.Decimal(17, 4)
+  ISU_DT      String?  @default("00000000", map: "DF__ATAXCARD__ISU_DT__7F379B7E") @db.NVarChar(8)
+  ISU_SQ      Decimal? @default(0, map: "DF__ATAXCARD__ISU_SQ__002BBFB7") @db.Decimal(5, 0)
+  LN_SQ       Decimal? @default(0, map: "DF__ATAXCARD__LN_SQ__011FE3F0") @db.Decimal(3, 0)
+  DUMMY1      String?  @db.NVarChar(20)
+  DUMMY2      String?  @db.NVarChar(20)
+  CARD_TR_CD  String?  @db.NVarChar(10)
+  CARD_TR_NM  String?  @db.NVarChar(40)
+  CARD_REG_NB String?  @db.NVarChar(20)
+  CARD_MEM_NB String?  @db.NVarChar(20)
+  SINGO_FG    String   @default("0", map: "DF__ATAXCARD__SINGO___1A35AA7D") @db.NVarChar(1)
+  TAX_FG      String?  @db.NVarChar(2)
+  DATA_CD     String?  @db.VarChar(50)
+  NONSUB_TY   String?  @db.VarChar(3)
+  MATT_CNT    Decimal? @default(0, map: "DF__ATAXCARD__MATT_C__2E6F4720") @db.Decimal(15, 4)
+  ASSET_AM    Decimal? @default(0, map: "DF__ATAXCARD__ASSET___2F636B59") @db.Decimal(17, 4)
+  ASSET_VAT   Decimal? @default(0, map: "DF__ATAXCARD__ASSET___30578F92") @db.Decimal(17, 4)
+  ID_ID       Int?     @default(0, map: "DF__ATAXCARD__ID_ID__314BB3CB")
+
+  @@id([CO_CD, DIV_CD, FR_YM, TO_YM, CARD_FG, CARD_SQ, SINGO_FG], map: "PK_ATAXCARD")
+}
+
+model FACE_ERP_FNOTE_ITEM_COMMENT {
+  COMPANY_CD       String  @db.NVarChar(50)
+  UNIT_CD          String  @db.NVarChar(50)
+  BIZ_CD           String  @db.NVarChar(50)
+  START_DT         String  @db.NVarChar(8)
+  END_DT           String  @db.NVarChar(8)
+  FOOTNOTE_TYPE    String  @db.NVarChar(128)
+  FOOTNOTE_ID      String  @db.NVarChar(16)
+  FOOTNOTE_ITEM_ID String  @db.NVarChar(16)
+  RMRK_TOP         String? @db.NVarChar(4000)
+  RMRK_DOWN        String? @db.NVarChar(4000)
+  FILE_NAME        String? @db.NVarChar(200)
+  BINARY           String? @db.Text
+
+  @@id([COMPANY_CD, UNIT_CD, BIZ_CD, START_DT, END_DT, FOOTNOTE_TYPE, FOOTNOTE_ID, FOOTNOTE_ITEM_ID], map: "PK_FACE_ERP_FN_ITEM_COMMENT")
+}
+
+model FACE_ERP_FNOTE_ITEM_VALUE {
+  COMPANY_CD       String  @db.NVarChar(50)
+  UNIT_CD          String  @db.NVarChar(50)
+  BIZ_CD           String  @db.NVarChar(50)
+  START_DT         String  @db.NVarChar(8)
+  END_DT           String  @db.NVarChar(8)
+  FOOTNOTE_TYPE    String  @db.NVarChar(128)
+  FOOTNOTE_ID      String  @db.NVarChar(16)
+  FOOTNOTE_ITEM_ID String  @db.NVarChar(16)
+  ROW_IDX          String  @db.NVarChar(16)
+  NAME             String  @db.NVarChar(100)
+  VALUE            String? @db.NVarChar(256)
+
+  @@id([COMPANY_CD, UNIT_CD, BIZ_CD, START_DT, END_DT, FOOTNOTE_TYPE, FOOTNOTE_ID, FOOTNOTE_ITEM_ID, ROW_IDX, NAME], map: "PK_FACE_ERP_FN_ITEM_VALUE")
+}
+
+model FACE_ERP_SAMPLE_COLS {
+  ID_REF    String  @db.NVarChar(16)
+  NAMESPACE String  @db.NVarChar(128)
+  NAME      String  @db.NVarChar(128)
+  SUM       String? @db.NVarChar(128)
+  WIDTH     String? @db.NVarChar(10)
+  FORMAT    String? @db.NVarChar(128)
+  TYPE      String? @db.NVarChar(128)
+  XBRLTYPE  String? @db.NVarChar(5)
+  ABSTRACT  String? @db.NVarChar(5)
+
+  @@id([ID_REF, NAMESPACE, NAME], map: "PK_FACE_ERP_S_COLS")
+}
+
+model FACE_ERP_SAMPLE_ITEM_MASTER {
+  FOOTNOTE_ID      String  @db.NVarChar(16)
+  FOOTNOTE_ITEM_ID String  @db.NVarChar(16)
+  TITLE            String? @db.NVarChar(256)
+  ORDER            String? @db.NVarChar(128)
+
+  @@id([FOOTNOTE_ID, FOOTNOTE_ITEM_ID], map: "PK_FACE_ERP_S_ITEM_MASTER")
+}
+
+model FACE_ERP_SAMPLE_LABELS {
+  ID_REF    String  @db.NVarChar(16)
+  ROLETYPE  String  @db.NVarChar(128)
+  NAMESPACE String  @db.NVarChar(128)
+  NAME      String  @db.NVarChar(128)
+  LABEL     String? @db.NVarChar(128)
+  LANG      String  @db.NChar(10)
+
+  @@id([ID_REF, ROLETYPE, NAMESPACE, NAME, LANG], map: "PK_FACE_ERP_S_LABELS")
+}
+
+model FACE_ERP_SAMPLE_MASTER {
+  FOOTNOTE_ID   String  @id(map: "PK_FACE_ERP_S_MASTER") @db.NVarChar(16)
+  TITLE         String? @db.NVarChar(256)
+  FOOTNOTE_TYPE String? @db.NVarChar(128)
+  ORDER         String? @db.NVarChar(128)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model FACE_ERP_SAMPLE_PRESENTATIONS {
+  ID_REF         String  @db.NVarChar(16)
+  ROLETYPE       String  @db.NVarChar(128)
+  NAMESPACE_FROM String? @db.NVarChar(128)
+  NAME_FROM      String? @db.NVarChar(128)
+  NAMESPACE_TO   String  @db.NVarChar(128)
+  NAME_TO        String  @db.NVarChar(128)
+  ORDER          Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model FACE_ERP_SAMPLE_ROLETYPES {
+  ID_REF       String  @db.NVarChar(16)
+  ROLETYPE_ID  String? @db.NVarChar(128)
+  ROLETYPE_URI String  @db.NVarChar(128)
+  DEFINITION   String? @db.Text
+
+  @@ignore
+}
+
+model FACE_ERP_SAMPLE_WORKSHEET {
+  NUMBER  String  @id(map: "PK_FACE_ERP_SAMPLE_WORKSHEET") @db.NVarChar(255)
+  NAME    String? @db.NVarChar(255)
+  NAME_EN String? @db.NVarChar(255)
+  TYPE    String? @db.NVarChar(255)
+}
+
+model FACE_FSYS_CMN_ID {
+  TABLE_NAME  String   @db.VarChar(128)
+  COLUMN_NAME String   @db.VarChar(128)
+  CUR_DATE    String?  @db.VarChar(8)
+  CUR_ID      Decimal? @db.Decimal(8, 0)
+
+  @@id([TABLE_NAME, COLUMN_NAME], map: "PK_FSYS_CMN_ID")
+}
+
+model FACE_SYS_FNOTE_COLS {
+  ID_REF    String  @db.NVarChar(16)
+  NAMESPACE String  @db.NVarChar(128)
+  NAME      String  @db.NVarChar(128)
+  SUM       String? @db.NVarChar(128)
+  WIDTH     String? @db.NVarChar(10)
+  FORMAT    String? @db.NVarChar(128)
+  TYPE      String? @db.NVarChar(128)
+  XBRLTYPE  String? @db.NVarChar(5)
+  ABSTRACT  String? @db.NVarChar(5)
+  ORDER_SEQ Int?
+
+  @@id([ID_REF, NAMESPACE, NAME], map: "PK_FACE_SYS_FN_COLS")
+}
+
+model FACE_SYS_FNOTE_COMMON {
+  ID_REF       String  @id(map: "PK_FACE_AUDIT_FN_COMMON") @db.NVarChar(16)
+  TAXONOMY_URL String? @db.NVarChar(256)
+  NAMESPACE    String? @db.NVarChar(128)
+  ROLETYPE     String? @db.NVarChar(128)
+}
+
+model FACE_SYS_FNOTE_ITEM_MASTER {
+  FOOTNOTE_ID      String  @db.NVarChar(16)
+  FOOTNOTE_ITEM_ID String  @db.NVarChar(16)
+  TITLE            String? @db.NVarChar(256)
+  FITEM_ORDER      String? @db.NVarChar(128)
+
+  @@id([FOOTNOTE_ID, FOOTNOTE_ITEM_ID], map: "PK_FACE_AUDIT_FN_ID_MASTER")
+}
+
+model FACE_SYS_FNOTE_LABELS {
+  ID_REF    String  @db.NVarChar(16)
+  ROLETYPE  String  @db.NVarChar(128)
+  NAMESPACE String  @db.NVarChar(128)
+  NAME      String  @db.NVarChar(128)
+  LABEL     String? @db.NVarChar(128)
+  LANG      String  @db.NChar(10)
+
+  @@id([ID_REF, ROLETYPE, NAMESPACE, NAME, LANG], map: "PK_FACE_SYS_FN_LABELS")
+}
+
+model FACE_SYS_FNOTE_MASTER {
+  FOOTNOTE_ID   String  @id(map: "PK_FACE_AUDIT_FN_MASTER") @db.NVarChar(16)
+  TITLE         String? @db.NVarChar(256)
+  FOOTNOTE_TYPE String? @db.NVarChar(128)
+  F_ORDER       String? @db.NVarChar(128)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model FACE_SYS_FNOTE_PRESENTATIONS {
+  ID_REF         String  @db.NVarChar(16)
+  ROLETYPE       String  @db.NVarChar(128)
+  NAMESPACE_FROM String? @db.NVarChar(128)
+  NAME_FROM      String? @db.NVarChar(128)
+  NAMESPACE_TO   String  @db.NVarChar(128)
+  NAME_TO        String  @db.NVarChar(128)
+  PRE_ORDER      Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model FACE_SYS_FNOTE_ROLETYPES {
+  ID_REF       String  @db.NVarChar(16)
+  ROLETYPE_ID  String? @db.NVarChar(128)
+  ROLETYPE_URI String  @db.NVarChar(128)
+  DEFINITION   String? @db.Text
+
+  @@ignore
+}
+
+model FI_DZAIS_CVT_LOG {
+  CD_COMPANY String   @db.NVarChar(7)
+  TP_MODULE  String   @db.VarChar(2)
+  TP_PART    String   @db.VarChar(3)
+  CD_TABLE   String   @db.VarChar(30)
+  NM_LOG     String   @db.VarChar(100)
+  NM_ACTION  String?  @db.VarChar(50)
+  NO_COUNT   Decimal? @db.Decimal(19, 0)
+  DTS_INSERT String?  @db.NVarChar(14)
+  ID_INSERT  String?  @db.NVarChar(15)
+  DTS_UPDATE String?  @db.NVarChar(14)
+  ID_UPDATE  String?  @db.NVarChar(15)
+
+  @@id([CD_COMPANY, TP_MODULE, TP_PART, CD_TABLE, NM_LOG], map: "PK_FI_DZAIS_CVT_LOG")
+}
+
+model HTX_TAXDATA_D {
+  CO_CD     String    @db.NVarChar(7)
+  MENU_CD   String    @db.NVarChar(10)
+  DIV_CD    String    @db.NVarChar(7)
+  YM_INSA   String    @db.NVarChar(6)
+  CD_EMP    String    @db.NVarChar(12)
+  SEQ_NO    Decimal   @db.Decimal(10, 0)
+  FORM      String    @db.NVarChar(12)
+  PAGE      Decimal   @db.Decimal(10, 0)
+  GRP       Decimal   @db.Decimal(10, 0)
+  CODE      Decimal   @db.Decimal(10, 0)
+  REF       Decimal?  @db.Decimal(10, 0)
+  SNO       Decimal   @db.Decimal(10, 0)
+  STR01     String?   @db.NVarChar(500)
+  STR02     String?   @db.NVarChar(500)
+  STR03     String?   @db.NVarChar(500)
+  STR04     String?   @db.NVarChar(500)
+  STR05     String?   @db.NVarChar(500)
+  STR06     String?   @db.NVarChar(500)
+  STR07     String?   @db.NVarChar(500)
+  STR08     String?   @db.NVarChar(500)
+  STR09     String?   @db.NVarChar(500)
+  STR10     String?   @db.NVarChar(500)
+  STR11     String?   @db.NVarChar(500)
+  STR12     String?   @db.NVarChar(500)
+  STR13     String?   @db.NVarChar(500)
+  STR14     String?   @db.NVarChar(500)
+  STR15     String?   @db.NVarChar(500)
+  STR16     String?   @db.NVarChar(500)
+  STR17     String?   @db.NVarChar(500)
+  STR18     String?   @db.NVarChar(500)
+  STR19     String?   @db.NVarChar(500)
+  STR20     String?   @db.NVarChar(500)
+  NUM01     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM01__11D30872") @db.Decimal(23, 5)
+  NUM02     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM02__12C72CAB") @db.Decimal(23, 5)
+  NUM03     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM03__13BB50E4") @db.Decimal(23, 5)
+  NUM04     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM04__14AF751D") @db.Decimal(23, 5)
+  NUM05     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM05__15A39956") @db.Decimal(23, 5)
+  NUM06     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM06__1697BD8F") @db.Decimal(23, 5)
+  NUM07     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM07__178BE1C8") @db.Decimal(23, 5)
+  NUM08     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM08__18800601") @db.Decimal(23, 5)
+  NUM09     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM09__19742A3A") @db.Decimal(23, 5)
+  NUM10     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM10__1A684E73") @db.Decimal(23, 5)
+  NUM11     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM11__1B5C72AC") @db.Decimal(23, 5)
+  NUM12     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM12__1C5096E5") @db.Decimal(23, 5)
+  NUM13     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM13__1D44BB1E") @db.Decimal(23, 5)
+  NUM14     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM14__1E38DF57") @db.Decimal(23, 5)
+  NUM15     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM15__1F2D0390") @db.Decimal(23, 5)
+  NUM16     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM16__202127C9") @db.Decimal(23, 5)
+  NUM17     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM17__21154C02") @db.Decimal(23, 5)
+  NUM18     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM18__2209703B") @db.Decimal(23, 5)
+  NUM19     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM19__22FD9474") @db.Decimal(23, 5)
+  NUM20     Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM20__23F1B8AD") @db.Decimal(23, 5)
+  INSERT_ID String?   @db.NVarChar(30)
+  INSERT_DT DateTime? @db.DateTime
+  INSERT_IP String?   @db.NVarChar(15)
+  MODIFY_ID String?   @db.NVarChar(30)
+  MODIFY_DT DateTime? @db.DateTime
+  MODIFY_IP String?   @db.NVarChar(15)
+
+  @@id([CO_CD, MENU_CD, YM_INSA, CD_EMP, SEQ_NO, PAGE, GRP, CODE], map: "PK_HTX_TAXDATA_D")
+}
+
+model HTX_TAXDATA_H {
+  CO_CD      String    @db.NVarChar(7)
+  MENU_CD    String    @db.NVarChar(10)
+  DIV_CD     String    @db.NVarChar(7)
+  YM_INSA    String    @db.NVarChar(6)
+  CD_EMP     String    @db.NVarChar(12)
+  SEQ_NO     Decimal   @db.Decimal(10, 0)
+  KEY_FAMILY String    @db.NVarChar(10)
+  FORM       String    @db.NVarChar(12)
+  NO_SOCIAL  String?   @db.NVarChar(100)
+  NM_KRNAME  String?   @db.NVarChar(30)
+  STR01      String?   @db.NVarChar(500)
+  STR02      String?   @db.NVarChar(500)
+  STR03      String?   @db.NVarChar(500)
+  STR04      String?   @db.NVarChar(500)
+  STR05      String?   @db.NVarChar(500)
+  NUM01      Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM01__0B260AE3") @db.Decimal(23, 5)
+  NUM02      Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM02__0C1A2F1C") @db.Decimal(23, 5)
+  NUM03      Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM03__0D0E5355") @db.Decimal(23, 5)
+  NUM04      Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM04__0E02778E") @db.Decimal(23, 5)
+  NUM05      Decimal?  @default(0, map: "DF__HTX_TAXDA__NUM05__0EF69BC7") @db.Decimal(23, 5)
+  INSERT_ID  String?   @db.NVarChar(30)
+  INSERT_DT  DateTime? @db.DateTime
+  INSERT_IP  String?   @db.NVarChar(15)
+  MODIFY_ID  String?   @db.NVarChar(30)
+  MODIFY_DT  DateTime? @db.DateTime
+  MODIFY_IP  String?   @db.NVarChar(15)
+
+  @@id([CO_CD, MENU_CD, YM_INSA, CD_EMP, SEQ_NO], map: "PK_HTX_TAXDATA_H")
+}
+
+model IFRS_FOOTNOTE_INFO {
+  CO_CD        String   @db.NVarChar(50)
+  FOOTNOTE_CD  String   @db.NVarChar(50)
+  FOOTNOTE_NM  String   @db.NVarChar(100)
+  FOOTNOTE_ENG String   @db.NVarChar(100)
+  FOOTNOTE_DC  String?  @db.NVarChar(4000)
+  REMARK_DC    String?  @db.NVarChar(200)
+  TEXT_FG      String?  @default("N", map: "DF__IFRS_FOOT__TEXT___320C32BE") @db.Char(1)
+  SORT_SEQ     Decimal? @default(0, map: "DF__IFRS_FOOT__SORT___330056F7") @db.Decimal(5, 0)
+  LEVEL_CD     Decimal? @default(0, map: "DF__IFRS_FOOT__LEVEL__33F47B30") @db.Decimal(3, 0)
+
+  @@id([CO_CD, FOOTNOTE_CD], map: "PK_IFRS_FOOTNOTE_INFO")
+}
+
+model IFRS_FOOTNOTE_INFO_SCHEMA {
+  CO_CD       String @db.NVarChar(50)
+  FOOTNOTE_CD String @db.NVarChar(50)
+  COL_SEQ     Int
+  COL_NM_KR   String @db.NVarChar(20)
+  COL_NM_ENG  String @db.NVarChar(20)
+  DATA_GUBUN  String @db.Char(1)
+
+  @@id([CO_CD, FOOTNOTE_CD, COL_SEQ], map: "PK_IFRS_FOOTNOTE_INFO_SCHEMA")
+}
+
+model IFRS_FOOTNOTE_INFO_VALUE {
+  CO_CD       String  @db.NVarChar(50)
+  FOOTNOTE_CD String  @db.NVarChar(50)
+  ROW_SEQ     Int
+  COL_SEQ     Int
+  ITEM_VALUE  String? @db.NVarChar(20)
+
+  @@id([CO_CD, FOOTNOTE_CD, ROW_SEQ, COL_SEQ], map: "PK_IFRS_FOOTNOTE_INFO_VALUE")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model lkj83 {
+  TP_GRP       String? @db.VarChar(3)
+  CD_ACCT      String? @db.NVarChar(10)
+  TP_PRINTTYPE String? @db.VarChar(3)
+  CD_ACCOST    String? @db.NVarChar(10)
+  TP_GUBUN     String? @db.VarChar(2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model lkj832 {
+  CD_ACCT String?  @db.NVarChar(10)
+  CD_CODE String?  @db.NVarChar(20)
+  DR_SUM  Decimal? @db.Decimal(19, 4)
+  CR_SUM  Decimal? @db.Decimal(19, 4)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model pbcatcol {
+  pbc_tnam String? @db.Char(30)
+  pbc_tid  Int?
+  pbc_ownr String? @db.Char(30)
+  pbc_cnam String? @db.Char(30)
+  pbc_cid  Int?    @db.SmallInt
+  pbc_labl String? @db.VarChar(254)
+  pbc_lpos Int?    @db.SmallInt
+  pbc_hdr  String? @db.VarChar(254)
+  pbc_hpos Int?    @db.SmallInt
+  pbc_jtfy Int?    @db.SmallInt
+  pbc_mask String? @db.VarChar(31)
+  pbc_case Int?    @db.SmallInt
+  pbc_hght Int?    @db.SmallInt
+  pbc_wdth Int?    @db.SmallInt
+  pbc_ptrn String? @db.VarChar(31)
+  pbc_bmap String? @db.Char(1)
+  pbc_init String? @db.VarChar(254)
+  pbc_cmnt String? @db.VarChar(254)
+  pbc_edit String? @db.VarChar(31)
+  pbc_tag  String? @db.VarChar(254)
+
+  @@unique([pbc_tnam, pbc_ownr, pbc_cnam], map: "pbcatcol_idx")
+  @@ignore
+}
+
+model pbcatedt {
+  pbe_name String  @db.VarChar(30)
+  pbe_edit String? @db.VarChar(254)
+  pbe_type Int     @db.SmallInt
+  pbe_cntr Int?
+  pbe_seqn Int     @db.SmallInt
+  pbe_flag Int?
+  pbe_work String? @db.Char(32)
+
+  @@unique([pbe_name, pbe_seqn], map: "pbcatedt_idx")
+}
+
+model pbcatfmt {
+  pbf_name String @unique(map: "pbcatfmt_idx") @db.VarChar(30)
+  pbf_frmt String @db.VarChar(254)
+  pbf_type Int    @db.SmallInt
+  pbf_cntr Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model pbcattbl {
+  pbt_tnam String? @db.Char(30)
+  pbt_tid  Int?
+  pbt_ownr String? @db.Char(30)
+  pbd_fhgt Int?    @db.SmallInt
+  pbd_fwgt Int?    @db.SmallInt
+  pbd_fitl String? @db.Char(1)
+  pbd_funl String? @db.Char(1)
+  pbd_fchr Int?    @db.SmallInt
+  pbd_fptc Int?    @db.SmallInt
+  pbd_ffce String? @db.Char(32)
+  pbh_fhgt Int?    @db.SmallInt
+  pbh_fwgt Int?    @db.SmallInt
+  pbh_fitl String? @db.Char(1)
+  pbh_funl String? @db.Char(1)
+  pbh_fchr Int?    @db.SmallInt
+  pbh_fptc Int?    @db.SmallInt
+  pbh_ffce String? @db.Char(32)
+  pbl_fhgt Int?    @db.SmallInt
+  pbl_fwgt Int?    @db.SmallInt
+  pbl_fitl String? @db.Char(1)
+  pbl_funl String? @db.Char(1)
+  pbl_fchr Int?    @db.SmallInt
+  pbl_fptc Int?    @db.SmallInt
+  pbl_ffce String? @db.Char(32)
+  pbt_cmnt String? @db.VarChar(254)
+
+  @@unique([pbt_tnam, pbt_ownr], map: "pbcattbl_idx")
+  @@ignore
+}
+
+model pbcatvld {
+  pbv_name String  @unique(map: "pbcatvld_idx") @db.VarChar(30)
+  pbv_vald String  @db.VarChar(254)
+  pbv_type Int     @db.SmallInt
+  pbv_cntr Int?
+  pbv_msg  String? @db.VarChar(254)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model SEC_FIRST_TEMP {
+  TP_GRP       String? @db.VarChar(3)
+  CD_ACCT      String? @db.NVarChar(10)
+  TP_PRINTTYPE String? @db.VarChar(3)
+  CD_ACCOST    String? @db.NVarChar(10)
+  TP_GUBUN     String? @db.VarChar(2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model SEC_SEC_TEMP {
+  CD_ACCT String? @db.NVarChar(10)
+  CD_CODE String? @db.NVarChar(20)
+  DR_SUM  Float?
+  CR_SUM  Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_FIRST_TEMP {
+  TP_GRP       String? @db.VarChar(3)
+  CD_ACCT      String? @db.NVarChar(10)
+  TP_PRINTTYPE String? @db.VarChar(3)
+  CD_ACCOST    String? @db.NVarChar(10)
+  TP_GUBUN     String? @db.VarChar(2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_FIRST_TEMP1 {
+  TP_GRP       String? @db.VarChar(3)
+  CD_ACCT      String? @db.NVarChar(10)
+  TP_PRINTTYPE String? @db.VarChar(3)
+  CD_ACCOST    String? @db.NVarChar(10)
+  TP_GUBUN     String? @db.VarChar(2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_FIRST_TEMP2 {
+  TP_GRP       String? @db.VarChar(3)
+  CD_ACCT      String? @db.NVarChar(10)
+  TP_PRINTTYPE String? @db.VarChar(3)
+  CD_ACCOST    String? @db.NVarChar(10)
+  TP_GUBUN     String? @db.VarChar(2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_SEC_TEMP {
+  CD_ACCT String? @db.NVarChar(10)
+  CD_CODE String? @db.NVarChar(20)
+  DR_SUM  Float?
+  CR_SUM  Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_SEC_TEMP1 {
+  CD_ACCT String? @db.NVarChar(10)
+  CD_CODE String? @db.NVarChar(20)
+  DR_SUM  Float?
+  CR_SUM  Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_SEC_TEMP2 {
+  CD_ACCT String? @db.NVarChar(10)
+  CD_CODE String? @db.NVarChar(20)
+  DR_SUM  Float?
+  CR_SUM  Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_TEST1 {
+  TP_GRP       String? @db.VarChar(3)
+  CD_ACCT      String? @db.NVarChar(10)
+  TP_PRINTTYPE String? @db.VarChar(3)
+  CD_ACCOST    String? @db.NVarChar(10)
+  TP_GUBUN     String? @db.VarChar(2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model STS_TEST2 {
+  CD_ACCT String?  @db.NVarChar(10)
+  CD_CODE String?  @db.NVarChar(20)
+  DR_SUM  Decimal? @db.Decimal(19, 4)
+  CR_SUM  Decimal? @db.Decimal(19, 4)
+
+  @@ignore
+}
+
+model Z_MAP_MU {
+  CD_FIELD String  @db.NVarChar(10)
+  NM_FIELD String? @db.NVarChar(50)
+  CD_MCODE String  @db.NVarChar(30)
+  CD_UCODE String  @db.NVarChar(30)
+  REMARK   String? @db.NVarChar(100)
+
+  @@id([CD_FIELD, CD_MCODE], map: "PK_Z_MAP_MU")
+}
+
+model Z_MAP_MU_CMP {
+  CD_COMPANY String  @db.NVarChar(7)
+  CD_FIELD   String  @db.NVarChar(10)
+  NM_FIELD   String? @db.NVarChar(50)
+  CD_MCODE   String  @db.NVarChar(30)
+  CD_UCODE   String  @db.NVarChar(30)
+  REMARK     String? @db.NVarChar(100)
+
+  @@id([CD_COMPANY, CD_FIELD, CD_MCODE], map: "PK_Z_MAP_MU_CMP")
+}
+
+model Z_RESULT_MU {
+  CD_SEQ   Int      @default(autoincrement())
+  TP_CLASS String   @db.NVarChar(3)
+  NM_TABLE String   @db.NVarChar(50)
+  M3_TABLE String?  @db.NVarChar(50)
+  IU_TABLE String?  @db.NVarChar(50)
+  RTN_CNT  Decimal? @db.Decimal(10, 0)
+
+  @@id([CD_SEQ, TP_CLASS, NM_TABLE], map: "PK_Z_RESULT_MU")
+}
