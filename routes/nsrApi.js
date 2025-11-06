@@ -3,7 +3,7 @@ const mssqlExec = require('./mssqlExec');
 const moment = require('moment');
 const nsrApi = router();
 
-nsrApi.all('/insert_docu_import_material/:user_id', async (req, res) => {
+nsrApi.all('/insert_docu_domestic_material/:user_id', async (req, res) => {
     let input = req.body.DATA1;
     let today = moment().format('YYYYMMDD');
 
