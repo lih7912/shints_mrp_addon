@@ -4,6 +4,7 @@ const cors = require('cors');
 const fileupload = require('express-fileupload');
 const serveStatic = require('serve-static');
 const restApi = require('../routes/restapi');
+const nsrApi = require('../routes/nsrApi');
 
 const fs = require('fs');
 const https = require('https');
@@ -20,7 +21,6 @@ const options = {
   cert: fs.readFileSync(process.env.CERT)
 };
 
-
 async function startApolloServer() {
   const server = new ApolloServer({ schema });
   await server.start();
@@ -33,6 +33,7 @@ async function startApolloServer() {
   app.use(serveStatic(`${__dirname}/public`));
 
   app.use('/restapi', restApi);
+  app.use('/nsrapi', nsrApi);
 
   app.use(function (req, res, next) {
     /* API 접근을 허용하기 위한 Setting */
