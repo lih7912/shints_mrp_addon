@@ -143,40 +143,40 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
             NULL,      -- E_TY 관련 코드
             '00000000',      -- 시작일자
             '00000000',      -- 종료일자
-            ${CT_QT},        -- 수량
-            ${CT_AM},        -- 금액
-            ${CT_RT},        -- 비율
-            '${CT_DEAL}',    -- K_TY 코드
-            '${DEAL_NM}',    -- K_TY 관련 코드명
-            '${CT_USER1}',   -- L_TY 코드
-            '${USER1_NM}',   -- CT_USER1 명
-            '${CT_USER2}',   -- M_TY 코드
-            '${USER2_NM}',   -- CT_USER2 명
-            '${EXCH_TY}',    -- 외화종류
-            ${EXCH_AM},      -- 외화금액
-            '${PAYMENT}',    -- 지급은행지점명
-            '${ISU_NM}',     -- 발행인
-            '${ENDORS_NM}',  -- 배서인
-            '${BILL_FG1}',   -- 어음종류
-            '${BILL_FG2}',   -- 수금구분
-            '${DUMMY1}',     -- 여분1
-            '${DUMMY2}',     -- 여분2
-            '${DUMMY3}',     -- 여분3
+            NULL,        -- 수량
+            NULL,        -- 금액
+            NULL,        -- 비율
+            NULL,    -- K_TY 코드
+            NULL,    -- K_TY 관련 코드명
+            NULL,   -- L_TY 코드
+            NULL,   -- CT_USER1 명
+            NULL,   -- M_TY 코드
+            NULL,   -- CT_USER2 명
+            NULL,    -- 외화종류
+            NULL,      -- 외화금액
+            NULL,    -- 지급은행지점명
+            NULL,     -- 발행인
+            NULL,  -- 배서인
+            NULL,   -- 어음종류
+            NULL,   -- 수금구분
+            NULL,     -- 여분1
+            NULL,     -- 여분2
+            NULL,     -- 여분3
             '${today}',  -- 입력일자
-            '${EX_FG}',      -- 자료구분
-            '${TR_NMK}',     -- 거래처명(다국어)
-            '${DEPT_NMK}',   -- 부서명(다국어)
-            '${PJT_NMK}',    -- 프로젝트명(다국어)
-            '${DEAL_NMK}',   -- 거래유형명(다국어)
-            '${USER1_NMK}',  -- 사용자1명(다국어)
-            '${USER2_NMK}',  -- 사용자2명(다국어)
-            '${RMK_DCK}',    -- 적요(다국어)
-            '${ISU_DOC}',    -- 품의내역
-            '${ISU_DOCK}',   -- 품의내역(다국어)
-            '${PRS_FG}',     -- ?
-            '${JEONJA_YN}',  -- 전자세금계산서여부
-            '${PAYMENT_PT}', -- 지급은행지점명
-            '${DEAL_FG}'     -- 보관구분
+            '0',      -- 자료구분
+            NULL,     -- 거래처명(다국어)
+            NULL,   -- 부서명(다국어)
+            NULL,    -- 프로젝트명(다국어)
+            NULL,   -- 거래유형명(다국어)
+            NULL,  -- 사용자1명(다국어)
+            NULL,  -- 사용자2명(다국어)
+            NULL,    -- 적요(다국어)
+            NULL,    -- 품의내역
+            NULL,   -- 품의내역(다국어)
+            NULL,     -- ?
+            NULL,  -- 전자세금계산서여부
+            NULL, -- 지급은행지점명
+            NULL     -- 보관구분
         );
         `
     )
