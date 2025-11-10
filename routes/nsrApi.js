@@ -4,7 +4,7 @@ const moment = require('moment');
 const nsrApi = router();
 
 nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
-    let input = req.body.DATA1;
+    let input = [...req.body][0].DATA1
     let today = moment().format('YYYYMMDD');
 
     console.log('-------------------', input);
@@ -14,20 +14,18 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     }
     
     let maxInSq = await mssqlExec.mssqlExec(
-        `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUH WHERE IN_DT = '${today}'`
+        `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUD WHERE IN_DT = '${today}'`
     );
+
     maxInSq = maxInSq[0].MAX_IN_SQ + 1;
 
     let maxLnSq = await mssqlExec.mssqlExec(
-        `SELECT ISNULL(MAX(LN_SQ), 0) AS MAX_LN_SQ FROM dbo.SAUTODOCUH WHERE IN_DT = '${today}' AND IN_SQ = ${maxInSq}`
+        `SELECT ISNULL(MAX(LN_SQ), 0) AS MAX_LN_SQ FROM dbo.SAUTODOCUD WHERE IN_DT = '${today}' AND IN_SQ = ${maxInSq}`
     );
     maxLnSq = maxLnSq[0].MAX_LN_SQ + 1;
     
     let documentNo = `${today}-${String(maxInSq).padStart(5, '0')}-${String(maxLnSq).padStart(3, '0')}`;
 
-    console.log('documentNo:', documentNo);
-
-    /*
     await mssqlExec.mssqlExec(
         `
         INSERT INTO dbo.SAUTODOCUD (
@@ -106,45 +104,45 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
             DEAL_FG       -- 보관구분
         )
         VALUES (
-            '${moment().format('YYYYMMDD')}',      -- 처리일자
-            ${IN_SQ},        -- 처리번호
-            ${LN_SQ},        -- 처리라인번호
-            '1000', -- 회사코드
-            '1000', -- 처리사업장
-            '${LOGIC_CD}',   -- 전표유형
-            '${ISU_DT}',     -- 결의일자
-            ${ISU_SQ},       -- 결의번호
-            '${DIV_CD}',     -- 회계단위
-            '${DEPT_CD}',    -- 결의부서
-            '${EMP_CD}',     -- 작업자
-            '${ACCT_CD}',    -- 계정과목
-            '${DRCR_FG}',    -- 차대구분
-            ${ACCT_AM},      -- 금액
-            '${RMK_NB}',     -- 적요번호
-            '${RMK_DC}',     -- 적요
-            '${ATTR_CD}',    -- 증빙구분
-            '${TRCD_TY}',    -- A_TY
-            '${TRNM_TY}',    -- B_TY
-            '${DEPTCD_TY}',  -- C_TY
-            '${PJTCD_TY}',   -- D_TY
-            '${CTNB_TY}',    -- E_TY
-            '${FRDT_TY}',    -- F_TY
-            '${TODT_TY}',    -- G_TY
-            '${QT_TY}',      -- H_TY
-            '${AM_TY}',      -- I_TY
-            '${RT_TY}',      -- J_TY
-            '${DEAL_TY}',    -- K_TY
-            '${USER1_TY}',   -- L_TY
-            '${USER2_TY}',   -- M_TY
-            '${TR_CD}',      -- 거래처코드
-            '${TR_NM}',      -- 거래처명
-            '${CT_DEPT}',    -- C_TY 관련 코드
-            '${DEPT_NM}',    -- C_TY 관련 코드명
-            '${PJT_CD}',     -- D_TY 관련 코드
-            '${PJT_NM}',     -- D_TY 관련 코드명
-            '${CT_NB}',      -- E_TY 관련 코드
-            '${FR_DT}',      -- 시작일자
-            '${TO_DT}',      -- 종료일자
+            '${today}',      -- 처리일자
+            ${maxInSq},        -- 처리번호
+            ${maxLnSq},        -- 처리라인번호
+            '3000', -- 회사코드
+            '3000', -- 처리사업장
+            '21',   -- 전표유형 21-매입, 31-매출, 41-수금,51-반제
+            '00000000',     -- 결의일자
+            0,       -- 결의번호
+            NULL,     -- 회계단위
+            NULL,    -- 결의부서
+            NULL,     -- 작업자
+            '${input.strAcct}',    -- 계정과목
+            '3',    -- 차대구분 3-차변, 4-대변
+            ${input.amt},      -- 금액
+            '0',     -- 적요번호
+            '${input.nm_note}',     -- 적요
+            NULL,    -- 증빙구분
+            NULL,    -- A_TY
+            NULL,    -- B_TY
+            NULL,  -- C_TY
+            NULL,   -- D_TY
+            NULL,    -- E_TY
+            NULL,    -- F_TY
+            NULL,    -- G_TY
+            NULL,      -- H_TY
+            NULL,      -- I_TY
+            NULL,      -- J_TY
+            NULL,    -- K_TY
+            NULL,   -- L_TY
+            NULL,   -- M_TY
+            NULL,      -- 거래처코드
+            NULL,      -- 거래처명
+            NULL,    -- C_TY 관련 코드
+            NULL,    -- C_TY 관련 코드명
+            NULL,     -- D_TY 관련 코드
+            NULL,     -- D_TY 관련 코드명
+            NULL,      -- E_TY 관련 코드
+            '00000000',      -- 시작일자
+            '00000000',      -- 종료일자
             ${CT_QT},        -- 수량
             ${CT_AM},        -- 금액
             ${CT_RT},        -- 비율
@@ -164,7 +162,7 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
             '${DUMMY1}',     -- 여분1
             '${DUMMY2}',     -- 여분2
             '${DUMMY3}',     -- 여분3
-            '${INSERT_DT}',  -- 입력일자
+            '${today}',  -- 입력일자
             '${EX_FG}',      -- 자료구분
             '${TR_NMK}',     -- 거래처명(다국어)
             '${DEPT_NMK}',   -- 부서명(다국어)
@@ -182,10 +180,10 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
         );
         `
     )
-    */
+    
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(JSON.stringify([ {INVOICE_NO: col.nm_note, DOCU_NO: documentNo} ]));
+    res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
 });
 
 module.exports = nsrApi;
