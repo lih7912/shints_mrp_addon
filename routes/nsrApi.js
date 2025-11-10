@@ -8,6 +8,10 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     let today = moment().format('YYYYMMDD');
 
     console.log('-------------------', input);
+
+    if (!input) {
+        res.end(JSON.stringify([ {INVOICE_NO: -1, DOCU_NO: -1} ]));   
+    }
     
     let maxInSq = await mssqlExec.mssqlExec(
         `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUH WHERE IN_DT = '${today}'`
