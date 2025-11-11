@@ -86,9 +86,10 @@ async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
     const today = moment().format('YYYYMMDD');
 
     let vendorName = input.nm_mngd1.replace(/\(.*?\)/g, '').trim();
+    let insideBrackets = [...input.nm_mngd1.matchAll(/\((.*?)\)/g)].map(m => m[1]);
     let vendorInfo = await mssqlExec.mssqlExec(
         `
-        SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_NM LIKE '%${vendorName}%'
+        SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_NM LIKE '%${vendorName}% OR TR_NM LIKE '${insideBrackets}'
         `
     );
     if (!vendorInfo?.length) {
