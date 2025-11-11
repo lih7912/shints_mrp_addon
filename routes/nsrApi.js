@@ -71,8 +71,8 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     let documentNo = `${today}-${String(maxInSq).padStart(5, '0')}-${String(maxLnSq).padStart(3, '0')}`;
 
     await execDbInsert('차변', input, maxInSq, maxLnSq, maxIsuSq, res);
-    await execDbInsert('대변', input, maxInSq, maxLnSq++, maxIsuSq, res);
-    await execDbInsert('부가세', input, maxInSq, maxLnSq++, maxIsuSq, res);
+    await execDbInsert('대변', input, maxInSq, ++maxLnSq, maxIsuSq, res);
+    await execDbInsert('부가세', input, maxInSq, ++maxLnSq, maxIsuSq, res);
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
@@ -260,8 +260,8 @@ async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
                 NULL,                 -- 거래유형명(다국어)
                 NULL,                 -- 사용자1명(다국어)
                 NULL,                 -- 사용자2명(다국어)
-                '원부자재',            -- 적요(다국어)
-                '',                   -- 품의내역
+                '',                   -- 적요(다국어)
+                '원부자재',            -- 품의내역
                 NULL,                 -- 품의내역(다국어)
                 NULL,                 -- 미정 필드 (?)
                 NULL,                 -- 전자세금계산서 여부
