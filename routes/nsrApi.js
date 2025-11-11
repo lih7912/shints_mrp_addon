@@ -89,7 +89,7 @@ async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
     let insideBrackets = [...input.nm_mngd1.matchAll(/\((.*?)\)/g)].map(m => m[1]);
     let vendorInfo = await mssqlExec.mssqlExec(
         `
-        SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_NM LIKE '%${vendorName}% OR TR_NM LIKE '${insideBrackets}'
+        SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_NM LIKE '%${vendorName}%' OR TR_NM LIKE '%${insideBrackets}%'
         `
     );
     if (!vendorInfo?.length) {
