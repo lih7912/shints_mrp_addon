@@ -5,13 +5,22 @@ const nsrApi = router();
 
 nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     let input = [...req.body][0].DATA1;
+    let input2 = [...req.body][0].DATA2;
     const today = moment().format('YYYYMMDD');
     
     if (!input) {
-        res.end(JSON.stringify([ {INVOICE_NO: -1, DOCU_NO: -1} ]));   
+        res.end(JSON.stringify([ {error: '입력값이 없습니다.'} ]));
+        return;
+    }
+
+    if (!input.nsrTrCd) {
+        res.end(JSON.stringify([ {error: '거래처정보가 입력되이 않았습니다.(NSR_TR_CD)'} ]));
+        return;
     }
 
     /*** 계정과목 NSR에 맞게 변환 ***/
+
+    // 차변
     input.ct_deal = '';
     // 부가세대급금
     if (input.cd_acct === '15400') {
@@ -50,6 +59,46 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     if (input.cd_acct === '15100') {
         input.cd_acct = '14600';
     }
+
+    // 대변
+    input.ct_deal = '';
+    // 부가세대급금
+    if (input2.cd_acct === '15400') {
+        input2.cd_acct = '13500';
+        
+        // 부가세대급금(면세)
+        if (input2.tp_tax === '26') {
+            input2.tp_tax = '23';
+            input2.ct_deal = '면세'
+        }
+
+        // 부가세대급금(영세)
+        if (input2.tp_tax === '23') {
+            input2.tp_tax = '22';
+            input2.ct_deal = '영세'
+        }
+
+        // 부가세대급금(과세)
+        if (input2.tp_tax === '21') {
+            input2.tp_tax = '21';
+            input2.ct_deal = '과세'
+        }
+    }
+
+    // 원재료
+    if (input2.cd_acct === '15400') {
+        input2.cd_acct = '14900';
+    }
+
+    // 미착품
+    if (input2.cd_acct === '16500') {
+        input2.cd_acct = '15600';
+    }
+
+    // 상품
+    if (input2.cd_acct === '15100') {
+        input2.cd_acct = '14600';
+    }
     /*** 계정과목 NSR에 맞게 변환 ***/
         
     let maxInSq = await mssqlExec.mssqlExec(
@@ -70,9 +119,9 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     
     let documentNo = `${today}-${String(maxInSq).padStart(5, '0')}-${String(maxLnSq).padStart(3, '0')}`;
 
-    await execDbInsert('차변', input, maxInSq, maxLnSq, maxIsuSq, res);
-    await execDbInsert('대변', input, maxInSq, ++maxLnSq, maxIsuSq, res);
-    await execDbInsert('부가세', input, maxInSq, ++maxLnSq, maxIsuSq, res);
+    await execDbInsert('차변', input, input2, maxInSq, maxLnSq, maxIsuSq, res);
+    await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
+    await execDbInsert('부가세', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
@@ -87,11 +136,7 @@ async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
 
     let vendorName = input.nm_mngd1.replace(/\(.*?\)/g, '').trim();
     let insideBrackets = [...input.nm_mngd1.matchAll(/\((.*?)\)/g)].map(m => m[1]);
-    let vendorInfo = await mssqlExec.mssqlExec(
-        `
-        SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_NM LIKE '%${vendorName}%' OR TR_NM LIKE '%${insideBrackets}%'
-        `
-    );
+    let vendorInfo = await mssqlExec.mssqlExec(`SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_CD = '${input.nsrTrCd}'`);
     if (!vendorInfo?.length) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(JSON.stringify([ {error: '거래처 정보를 찾을 수 없습니다.'} ]));
@@ -199,14 +244,14 @@ async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
                 ${maxLnSq},           -- 처리라인번호
                 '1000',               -- 회사코드
                 '1000',               -- 처리사업장
-                '21',                 -- 전표유형 (21: 매입, 31: 매출, 41: 수금, 51: 반제)
+                '${부가세 ? '21' : ''}', -- 전표유형 (21: 매입, 31: 매출, 41: 수금, 51: 반제)
                 '${today}',           -- 결의일자
                 ${maxIsuSq},          -- 결의번호
                 '1000',               -- 회계단위
                 '0800',               -- 결의부서
                 'N250519',            -- 작업자
-                '${input.cd_acct}',   -- 계정과목
-                '${차변 ? '3'  : 대변 ? '4' : '3'}',         -- 차대구분 (차변 3, 대변 4, 부가세 3)
+                '${차변 ? input.cd_acct : 대변 ? input2.cd_acct : '13500' }',   -- 계정과목
+                '${차변 ? '3' : 대변 ? '4' : '3'}',         -- 차대구분 (차변 3, 대변 4, 부가세 3)
                 ${AMT},               -- 금액
                 '',                   -- 적요번호
                 '${input.nm_note}',   -- 적요
@@ -236,7 +281,7 @@ async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
                 0,                    -- 수량
                 0,                    -- 금액 (부가세일 경우 부가세 금액)
                 0,                    -- 비율
-                '${input.tp_tax ?? 0}', -- K_TY 코드
+                '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
                 '${input.ct_deal ?? 0}',-- K_TY 관련 코드명
                 '${차변 ? '일반' : 대변 ? 'NULL' : '과세매입'}',  -- L_TY 코드 (차변 일반, 대변 null, 부가세 과세매입)
                 0,                    -- CT_USER1 명
