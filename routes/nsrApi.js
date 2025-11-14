@@ -281,7 +281,6 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 0,                    -- 비율
                 '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
                 '${input.ct_deal ?? ''}', -- K_TY 관련 코드명
-                0,                    -- CT_USER1 명
                 0,                    -- M_TY 코드
                 0,                    -- CT_USER2 명
                 NULL,                 -- 외화종류
