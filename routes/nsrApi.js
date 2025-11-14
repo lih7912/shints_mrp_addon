@@ -313,19 +313,6 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 NULL                  -- 보관구분
             );
             `
-
-                CT_AM,        -- 금액 (numeric)
-                CT_RT,        -- 비율 (numeric)
-                CT_DEAL,      -- K_TY 코드
-                DEAL_NM,      -- K_TY 관련 코드명
-                CT_USER1,     -- L_TY 코드
-                USER1_NM,     -- CT_USER1 명
-                CT_USER2,     -- M_TY 코드
-                USER2_NM,     -- CT_USER2 명
-                EXCH_TY,      -- 외화종류
-                EXCH_AM,      -- 외화금액
-
-
         )
     } catch (e) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
