@@ -159,7 +159,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
     }
 
     try {
-        await mssqlExec.mssqlExec(
+        let result = await mssqlExec.mssqlExec(
             `
             INSERT INTO dbo.SAUTODOCUD (
                 IN_DT,        -- 처리일자 (PK)
@@ -281,6 +281,8 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 0,                    -- 비율
                 '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
                 '${input.ct_deal ?? ''}', -- K_TY 관련 코드명
+                0,                    -- CT_USER1 명
+                0,                    -- CT_USER1 명
                 0,                    -- M_TY 코드
                 0,                    -- CT_USER2 명
                 NULL,                 -- 외화종류
@@ -310,7 +312,9 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 NULL                  -- 보관구분
             );
             `
-        )
+        );
+
+        console.log(result);
     } catch (e) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(JSON.stringify([ {error: e.message} ]));
