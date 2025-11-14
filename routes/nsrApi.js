@@ -288,7 +288,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 NULL,                    -- E_TY 관련 코드 
                 '00000000',           -- 시작일자
                 '${부가세 ? today : '00000000'}',            -- 종료일자 (부가세 today)
-                NULL                  -- 수량
+                NULL,                 -- 수량
                 NULL,                 -- 금액 (부가세일 경우 부가세 금액)
                 NULL,                 -- 비율
                 '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
