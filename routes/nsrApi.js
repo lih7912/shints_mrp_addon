@@ -148,16 +148,14 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
 
     let AMT = input.amt;  // 부가세 포함금액 (총액)
     const vatRate = 0.1;  // 부가세율 10%
-
-    const supplyAmt = Math.round(AMT / (1 + vatRate));  // 원금
-    const vatAmt = AMT - supplyAmt;                     // 부가세
+    let VAT = Math.round(AMT * (1 + vatRate));
 
     if (차변) {
-        AMT = supplyAmt;
-    } else if (대변) {
         AMT = input.amt;
+    } else if (대변) {
+        AMT = input.amt + VAT;
     } else if (부가세) {
-        AMT = vatAmt;
+        AMT = VAT;
     }
 
     try {
