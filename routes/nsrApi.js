@@ -293,7 +293,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 NULL,                 -- 비율
                 '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
                 '${input.ct_deal ?? 0}',-- K_TY 관련 코드명
-                ${차변 ? 'NULL' : 대변 ? 'NULL' : `'과세매입'`}',  -- L_TY 코드 (차변 일반, 대변 null, 부가세 과세매입)
+                ${차변 ? 'NULL' : 대변 ? 'NULL' : `'과세매입'`},  -- L_TY 코드 (차변 일반, 대변 null, 부가세 과세매입)
                 NULL,                 -- CT_USER1 명
                 NULL,                 -- M_TY 코드
                 NULL,                 -- CT_USER2 명
