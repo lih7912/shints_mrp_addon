@@ -127,7 +127,7 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
 });
 
-async function execDbInsert(mode, input, maxInSq, maxLnSq, maxIsuSq, res) {
+async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res) {
     const 차변   = mode === '차변';
     const 대변   = mode === '대변';
     const 부가세 = mode === '부가세';
