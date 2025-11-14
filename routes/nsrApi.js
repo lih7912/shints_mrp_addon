@@ -85,16 +85,6 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
         }
     }
 
-    // 차변이 원화선급금이면 대변은 원화외상매입금
-    if (input.cd_acct === '13101') {
-        input2.cd_acct = '25101';
-    }
-
-    // 차변이 외화선급금이면 대변은 외화외상매입금
-    if (input.cd_acct === '13102') {
-        input2.cd_acct = '25102';
-    }
-
     // 원재료
     if (input2.cd_acct === '15400') {
         input2.cd_acct = '14900';
@@ -131,7 +121,7 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
 
     await execDbInsert('차변', input, input2, maxInSq, maxLnSq, maxIsuSq, res);
     await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
-    //await execDbInsert('부가세', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
+    await execDbInsert('부가세', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
@@ -145,6 +135,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
     const today = moment().format('YYYYMMDD');
 
     let vendorName = input.nm_mngd1.replace(/\(.*?\)/g, '').trim();
+    let insideBrackets = [...input.nm_mngd1.matchAll(/\((.*?)\)/g)].map(m => m[1]);
     let vendorInfo = await mssqlExec.mssqlExec(`SELECT * FROM ZA_TRADE_DAIKIN WHERE TR_CD = '${input.nsrTrCd}'`);
     if (!vendorInfo?.length) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -162,10 +153,9 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
     const vatAmt = AMT - supplyAmt;                     // 부가세
 
     if (차변) {
-        //AMT = input.amt;
         AMT = supplyAmt;
     } else if (대변) {
-        AMT = supplyAmt;
+        AMT = input.amt;
     } else if (부가세) {
         AMT = vatAmt;
     }
@@ -258,47 +248,46 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 '${today}',           -- 결의일자
                 ${maxIsuSq},          -- 결의번호
                 '1000',               -- 회계단위
-                '0800',               -- 결의부서
-                'N250519',            -- 작업자
-                '${차변 ? input.cd_acct : input2.cd_acct}',   -- 계정과목
+                '0602',               -- 결의부서
+                 NULL,                -- 작업자
+                '${차변 ? input.cd_acct : 대변 ? input2.cd_acct : '13500' }',   -- 계정과목
                 '${차변 ? '3' : 대변 ? '4' : '3'}',         -- 차대구분 (차변 3, 대변 4, 부가세 3)
                 ${AMT},               -- 금액
                 '',                   -- 적요번호
                 '${input.nm_note}',   -- 적요
-                'A1',                 -- 증빙구분
-                'B1',                 -- A_TY
-                'C1',                 -- B_TY
-                '${차변 ? '0'  : 대변 ? 'D5' : '0'}',        -- C_TY (차변 0, 대변 D5, 부가세 0)
-                '${차변 ? 'E6' : '0'}',                      -- D_TY 사업장 (차변 E6, 대변 0, 부가세 0)
-                '${대변 ? 'F3' : 부가세 ? 'F1' : '0'}',      -- E_TY 관리번호 (차변 0, 대변 F3, 부가세 F1)
-                NULL,                 -- F_TY 발생일자
-                '${차변 ? 'H1' : 부가세 ? 'H3' : '0'}',      -- G_TY (차변 H1, 대변 0, 부가세 H3)
-                '${차변 ? 'I4' : 부가세 ? 'I3' : '0'}',      -- H_TY (차변 I4, 대변 0, 부가세 I3)
-                NULL,                 -- I_TY
-                '${차변 ? 'K6' : 부가세 ? 'K1' : '0'}',    -- J_TY (차변 K6, 대변 0, 부가세 K1)
-                NULL,                 -- K_TY 
-                NULL,                 -- L_TY
-                NULL,                 -- M_TY
+                '0',                  -- 증빙구분
+                'A1',                 -- A_TY
+                'B1',                 -- B_TY
+                'C1',                 -- C_TY
+                '${차변 ? '0'  : 대변 ? 'D5' : '0'}',        -- D_TY (차변 0, 대변 D5, 부가세 0)
+                '${차변 ? 'E6' : '0'}',                      -- E_TY 사업장 (차변 E6, 대변 0, 부가세 0)
+                '${대변 ? 'F3' : 부가세 ? 'F1' : '0'}',      -- F_TY 관리번호 (차변 0, 대변 F3, 부가세 F1)
+                0,                    -- G_TY 발생일자
+                '${차변 ? 'H1' : 부가세 ? 'H3' : '0'}',      -- H_TY (차변 H1, 대변 0, 부가세 H3)
+                '${차변 ? 'I4' : 부가세 ? 'I3' : '0'}',      -- I_TY (차변 I4, 대변 0, 부가세 I3)
+                0,                    -- J_TY
+                '${차변 ? 'K6' : 부가세 ? 'K1' : '0'}',      -- K_TY (차변 K6, 대변 0, 부가세 K1)
+                0,                    -- L_TY 
+                0,                    -- M_TY
                 '${vendorCd}',        -- 거래처코드
                 '${vendorName}',      -- 거래처명
                 '${차변 ? '1000' : 대변 ? '1000' : ''}',     -- C_TY 관련 코드 (차변 1000, 대변 1000, 부가세 '')
                 NULL,                 -- C_TY 관련 코드명
                 '${부가세 ? '1000' : ''}',                   -- D_TY 관련 코드 (차변 '', 대변 '', 부가세 1000)
                 '${부가세 ? '(주)엔에스알' : ''}',            -- D_TY 관련 코드명 (부가세 (주)엔에스알)
-                NULL,                    -- E_TY 관련 코드 
-                '00000000',           -- 시작일자
-                '${부가세 ? today : '00000000'}',            -- 종료일자 (부가세 today)
-                NULL,                 -- 수량
-                NULL,                 -- 금액 (부가세일 경우 부가세 금액)
-                NULL,                 -- 비율
+                0,                    -- E_TY 관련 코드 
+                '${부가세 ? today : ''}',                    -- 시작일자
+                '${부가세 ? today : ''}',                    -- 종료일자 (부가세 today)
+                0,                    -- 수량
+                ${부가세 ? AMT : 0},  -- 금액 (부가세일 경우 부가세 금액)
+                0,                    -- 비율
                 '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
-                '${input.ct_deal ?? 0}',-- K_TY 관련 코드명
-                ${차변 ? 'NULL' : 대변 ? 'NULL' : `'과세매입'`},  -- L_TY 코드 (차변 일반, 대변 null, 부가세 과세매입)
-                NULL,                 -- CT_USER1 명
-                NULL,                 -- M_TY 코드
-                NULL,                 -- CT_USER2 명
+                '${input.ct_deal ?? ''}', -- K_TY 관련 코드명
+                0,                    -- CT_USER1 명
+                0,                    -- M_TY 코드
+                0,                    -- CT_USER2 명
                 NULL,                 -- 외화종류
-                NULL,                 -- 외화금액
+                0,                    -- 외화금액
                 NULL,                 -- 지급은행지점명
                 NULL,                 -- 발행인
                 NULL,                 -- 배서인
@@ -319,11 +308,24 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 '원부자재',            -- 품의내역
                 NULL,                 -- 품의내역(다국어)
                 NULL,                 -- 미정 필드 (?)
-                NULL,                 -- 전자세금계산서 여부
+                '${부가세 ? '1' : ''}', -- 전자세금계산서 여부
                 NULL,                 -- 지급은행지점명
                 NULL                  -- 보관구분
             );
             `
+
+                CT_AM,        -- 금액 (numeric)
+                CT_RT,        -- 비율 (numeric)
+                CT_DEAL,      -- K_TY 코드
+                DEAL_NM,      -- K_TY 관련 코드명
+                CT_USER1,     -- L_TY 코드
+                USER1_NM,     -- CT_USER1 명
+                CT_USER2,     -- M_TY 코드
+                USER2_NM,     -- CT_USER2 명
+                EXCH_TY,      -- 외화종류
+                EXCH_AM,      -- 외화금액
+
+
         )
     } catch (e) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
