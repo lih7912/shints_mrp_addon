@@ -119,9 +119,10 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     
     let documentNo = `${today}-${String(maxInSq).padStart(5, '0')}-${String(maxLnSq).padStart(3, '0')}`;
 
-    await execDbInsert('차변', input, input2, maxInSq, maxLnSq, maxIsuSq, res);
+    await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, maxIsuSq, res);
+    await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
     await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
-    await execDbInsert('부가세', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
+
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
