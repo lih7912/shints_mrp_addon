@@ -146,14 +146,14 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
     vendorName = vendorInfo[0].TR_NM;
     let vendorCd = vendorInfo[0].TR_CD;
 
-    let AMT = input.amt;  // 부가세 포함금액 (총액)
+    let AMT = parseFloat(input.amt);  // 부가세 포함금액 (총액)
     const vatRate = 0.1;  // 부가세율 10%
     let VAT = Math.round(AMT * (1 + vatRate));
 
     if (차변) {
-        AMT = input.amt;
+        AMT = parseFloat(input.amt);
     } else if (대변) {
-        AMT = input.amt + VAT;
+        AMT = parseFloat(input.amt) + VAT;
     } else if (부가세) {
         AMT = VAT;
     }
