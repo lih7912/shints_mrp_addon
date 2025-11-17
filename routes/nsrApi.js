@@ -19,10 +19,10 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     }
 
     /*** 계정과목 NSR에 맞게 변환 ***/
+
     // 차변
     input.ct_deal = '';
-    input.cd_acct = '14900';
-
+    // 부가세대급금
     if (input.cd_acct === '15400') {
         input.cd_acct = '13500';
         
@@ -45,33 +45,67 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
         }
     }
 
+    // 원재료
+    if (input.cd_acct === '15400') {
+        input.cd_acct = '14900';
+    }
+
+    // 미착품
+    if (input.cd_acct === '16500') {
+        input.cd_acct = '15600';
+    }
+
+    // 상품
+    if (input.cd_acct === '15100') {
+        input.cd_acct = '14600';
+    }
+
     // 대변
     input.ct_deal = '';
-    input2.cd_acct = '25101'
-    // 부가세대급금(면세)
-    if (input2.tp_tax === '26') {
-        input2.tp_tax = '23';
-        input2.ct_deal = '면세'
+    // 부가세대급금
+    if (input2.cd_acct === '15400') {
+        input2.cd_acct = '13500';
+        
+        // 부가세대급금(면세)
+        if (input2.tp_tax === '26') {
+            input2.tp_tax = '23';
+            input2.ct_deal = '면세'
+        }
+
+        // 부가세대급금(영세)
+        if (input2.tp_tax === '23') {
+            input2.tp_tax = '22';
+            input2.ct_deal = '영세'
+        }
+
+        // 부가세대급금(과세)
+        if (input2.tp_tax === '21') {
+            input2.tp_tax = '21';
+            input2.ct_deal = '과세'
+        }
     }
 
-    // 부가세대급금(영세)
-    if (input2.tp_tax === '23') {
-        input2.tp_tax = '22';
-        input2.ct_deal = '영세'
+    // 원재료
+    if (input2.cd_acct === '15400') {
+        input2.cd_acct = '14900';
     }
 
-    // 부가세대급금(과세)
-    if (input2.tp_tax === '21') {
-        input2.tp_tax = '21';
-        input2.ct_deal = '과세'
+    // 미착품
+    if (input2.cd_acct === '16500') {
+        input2.cd_acct = '15600';
+    }
+
+    // 상품
+    if (input2.cd_acct === '15100') {
+        input2.cd_acct = '14600';
     }
     /*** 계정과목 NSR에 맞게 변환 ***/
 
     let maxInSq = await mssqlExec.mssqlExec(
-        `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUD`
+        `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUD IN_DT = '${today}'`
     );
-
-    maxInSq = maxInSq[0].MAX_IN_SQ + 1;
+    
+    maxInSq = maxInSq[0]?.MAX_IN_SQ + 1 || 100;
 
     let maxLnSq = await mssqlExec.mssqlExec(
         `SELECT ISNULL(MAX(LN_SQ), 0) AS MAX_LN_SQ FROM dbo.SAUTODOCUD WHERE IN_DT = '${today}' AND IN_SQ = ${maxInSq}`
@@ -210,7 +244,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 '1000',               -- 처리사업장
                 '${부가세 ? '21' : ''}', -- 전표유형 (21: 매입, 31: 매출, 41: 수금, 51: 반제)
                 '00000000',           -- 결의일자
-                ${maxIsuSq},          -- 결의번호
+                0,                    -- 결의번호
                 '1000',               -- 회계단위
                 '0602',               -- 결의부서
                  NULL,                -- 작업자
@@ -223,7 +257,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 'A1',                 -- A_TY
                 'B1',                 -- B_TY
                 'C1',                 -- C_TY
-                '${차변 ? '0'  : 대변 ? 'D5' : '0'}',        -- D_TY (차변 0, 대변 D5, 부가세 0)
+                '${부가세 ? 'D5' : '0'}',                    -- D_TY (차변 0, 대변 0, 부가세 D5)
                 '${차변 ? 'E6' : '0'}',                      -- E_TY 사업장 (차변 E6, 대변 0, 부가세 0)
                 '${대변 ? 'F3' : 부가세 ? 'F1' : '0'}',      -- F_TY 관리번호 (차변 0, 대변 F3, 부가세 F1)
                 0,                    -- G_TY 발생일자
@@ -238,14 +272,14 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 '${차변 ? '1000' : 대변 ? '1000' : ''}',     -- C_TY 관련 코드 (차변 1000, 대변 1000, 부가세 '')
                 NULL,                 -- C_TY 관련 코드명
                 '${부가세 ? '1000' : ''}',                   -- D_TY 관련 코드 (차변 '', 대변 '', 부가세 1000)
-                '${부가세 ? '(주)엔에스알' : ''}',            -- D_TY 관련 코드명 (부가세 (주)엔에스알)
+                NULL,                 -- D_TY 관련 코드명
                 0,                    -- E_TY 관련 코드 
-                '${부가세 ? today : ''}',                    -- 시작일자
-                '${부가세 ? today : ''}',                    -- 종료일자 (부가세 today)
+                '${부가세 ? today : '00000000'}',            -- 시작일자
+                '${부가세 ? today : '00000000'}',            -- 종료일자 (부가세 today)
                 0,                    -- 수량
-                ${부가세 ? AMT : 0},  -- 금액 (부가세일 경우 부가세 금액)
+                ${부가세 ? input.amt : 0},  -- 금액 (부가세일 경우 부가세 금액)
                 0,                    -- 비율
-                '${부가세 ? input.tp_tax : '0'}', -- K_TY 코드
+                '${부가세 ? '21' : '0'}', -- K_TY 코드
                 '${input.ct_deal ?? ''}', -- K_TY 관련 코드명
                 0,                    -- CT_USER1 명
                 0,                    -- CT_USER1 명
