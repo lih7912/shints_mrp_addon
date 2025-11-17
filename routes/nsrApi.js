@@ -19,10 +19,10 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     }
 
     /*** 계정과목 NSR에 맞게 변환 ***/
-
     // 차변
     input.ct_deal = '';
-    // 부가세대급금
+    input.cd_acct = '14900';
+
     if (input.cd_acct === '15400') {
         input.cd_acct = '13500';
         
@@ -45,62 +45,28 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
         }
     }
 
-    // 원재료
-    if (input.cd_acct === '15400') {
-        input.cd_acct = '14900';
-    }
-
-    // 미착품
-    if (input.cd_acct === '16500') {
-        input.cd_acct = '15600';
-    }
-
-    // 상품
-    if (input.cd_acct === '15100') {
-        input.cd_acct = '14600';
-    }
-
     // 대변
     input.ct_deal = '';
-    // 부가세대급금
-    if (input2.cd_acct === '15400') {
-        input2.cd_acct = '13500';
-        
-        // 부가세대급금(면세)
-        if (input2.tp_tax === '26') {
-            input2.tp_tax = '23';
-            input2.ct_deal = '면세'
-        }
-
-        // 부가세대급금(영세)
-        if (input2.tp_tax === '23') {
-            input2.tp_tax = '22';
-            input2.ct_deal = '영세'
-        }
-
-        // 부가세대급금(과세)
-        if (input2.tp_tax === '21') {
-            input2.tp_tax = '21';
-            input2.ct_deal = '과세'
-        }
+    input2.cd_acct = '25101'
+    // 부가세대급금(면세)
+    if (input2.tp_tax === '26') {
+        input2.tp_tax = '23';
+        input2.ct_deal = '면세'
     }
 
-    // 원재료
-    if (input2.cd_acct === '15400') {
-        input2.cd_acct = '14900';
+    // 부가세대급금(영세)
+    if (input2.tp_tax === '23') {
+        input2.tp_tax = '22';
+        input2.ct_deal = '영세'
     }
 
-    // 미착품
-    if (input2.cd_acct === '16500') {
-        input2.cd_acct = '15600';
-    }
-
-    // 상품
-    if (input2.cd_acct === '15100') {
-        input2.cd_acct = '14600';
+    // 부가세대급금(과세)
+    if (input2.tp_tax === '21') {
+        input2.tp_tax = '21';
+        input2.ct_deal = '과세'
     }
     /*** 계정과목 NSR에 맞게 변환 ***/
-        
+
     let maxInSq = await mssqlExec.mssqlExec(
         `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUD`
     );
@@ -243,7 +209,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
                 '1000',               -- 회사코드
                 '1000',               -- 처리사업장
                 '${부가세 ? '21' : ''}', -- 전표유형 (21: 매입, 31: 매출, 41: 수금, 51: 반제)
-                '${today}',           -- 결의일자
+                '00000000',           -- 결의일자
                 ${maxIsuSq},          -- 결의번호
                 '1000',               -- 회계단위
                 '0602',               -- 결의부서
