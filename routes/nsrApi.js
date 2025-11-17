@@ -148,7 +148,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
 
     let AMT = parseFloat(input.amt);  // 부가세 포함금액 (총액)
     const vatRate = 0.1;  // 부가세율 10%
-    let VAT = Math.round(AMT * (1 + vatRate));
+    let VAT = Math.round(AMT * vatRate);
 
     if (차변) {
         AMT = parseFloat(input.amt);
