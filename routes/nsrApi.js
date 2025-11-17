@@ -102,7 +102,7 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     /*** 계정과목 NSR에 맞게 변환 ***/
 
     let maxInSq = await mssqlExec.mssqlExec(
-        `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUD IN_DT = '${today}'`
+        `SELECT ISNULL(MAX(IN_SQ), 0) AS MAX_IN_SQ FROM dbo.SAUTODOCUD WHERE IN_DT = '${today}'`
     );
     
     maxInSq = maxInSq[0]?.MAX_IN_SQ + 1 || 100;
