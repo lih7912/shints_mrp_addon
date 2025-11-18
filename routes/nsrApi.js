@@ -3,9 +3,10 @@ const mssqlExec = require('./mssqlExec');
 const moment = require('moment');
 const nsrApi = router();
 
-nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
+nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
     let input = [...req.body][0].DATA1;
     let input2 = [...req.body][0].DATA2;
+    let input3 = [...req.body][0].DATA3;
     const today = moment().format('YYYYMMDD');
     
     if (!input) {
@@ -112,23 +113,24 @@ nsrApi.all('/insert_docu_material/:user_id', async (req, res) => {
     );
     maxLnSq = maxLnSq[0].MAX_LN_SQ + 1;
 
-    let maxIsuSq = await mssqlExec.mssqlExec(
-        `SELECT ISNULL(MAX(ISU_SQ), 0) AS MAX_ISU_SQ FROM dbo.SAUTODOCUD WHERE IN_DT = '${today}'`
-    );
-    maxIsuSq = maxIsuSq[0].MAX_ISU_SQ + 1;
-    
     let documentNo = `${today}-${String(maxInSq).padStart(5, '0')}-${String(maxLnSq).padStart(3, '0')}`;
 
-    await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, maxIsuSq, res);
-    await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
-    await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, maxIsuSq, res);
-
+    if (work_type === 'MATERIAL') {
+        await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, res);
+        await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, res);
+        await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res);
+    } else if (work_type === 'TAXBILL') {
+        // NSR의 경우 부가세 항목없이 차변과 원화미지급금만 기록
+        input2 = input3;
+        await execDbInsert('차변', input, input2, maxInSq, maxLnSq, res, work_type);
+        await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res, work_type);
+    }
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(JSON.stringify([ {INVOICE_NO: input.nm_note, DOCU_NO: documentNo} ]));
 });
 
-async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res) {
+async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_type) {
     const 차변   = mode === '차변';
     const 대변   = mode === '대변';
     const 부가세 = mode === '부가세';
@@ -148,7 +150,11 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, maxIsuSq, res
     let vendorCd = vendorInfo[0].TR_CD;
 
     let AMT = parseFloat(input.amt);  // 부가세 포함금액 (총액)
-    const vatRate = 0.1;  // 부가세율 10%
+    let vatRate = 0.1;  // 부가세율 10%
+
+    if (work_type === 'TAXBILL') {
+        vatRate = 0;
+    }
     let VAT = Math.round(AMT * vatRate);
 
     if (차변) {
