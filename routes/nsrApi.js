@@ -15,7 +15,7 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
     }
 
     if (!input.nsrTrCd) {
-        res.end(JSON.stringify([ {error: '거래처정보가 입력되이 않았습니다.(NSR_TR_CD)'} ]));
+        res.end(JSON.stringify([ {error: '거래처정보가 입력되지 않았습니다.(NSR_TR_CD)'} ]));
         return;
     }
 
