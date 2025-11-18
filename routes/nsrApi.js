@@ -7,6 +7,9 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
     let input = [...req.body][0].DATA1;
     let input2 = [...req.body][0].DATA2;
     let input3 = [...req.body][0].DATA3;
+    
+    const { user_id, work_type } = req.params;
+
     const today = moment().format('YYYYMMDD');
     
     if (!input) {
