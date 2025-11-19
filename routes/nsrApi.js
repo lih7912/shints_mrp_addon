@@ -105,7 +105,7 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
     }
 
     // 외화선급금일경우 input2가 비어서 옴, 대변을 input3으로 세팅
-    if (input.cd_acct === '10302') {
+    if (input.cd_acct === '13102') {
         input2 = input3;
     }
 
