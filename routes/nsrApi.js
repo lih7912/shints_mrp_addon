@@ -122,8 +122,6 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
         await execDbInsert('차변', input, input2, maxInSq, maxLnSq, res);
         await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res);
     } else if (work_type === 'TAXBILL') {
-        // NSR의 경우 부가세 항목없이 차변과 원화미지급금만 기록
-        input2 = input3;
         await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, res, work_type);
         await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, res, work_type);
         await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res, work_type);
@@ -158,7 +156,6 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_typ
     let VAT = Math.round(AMT * vatRate);
 
     if (work_type === 'TAXBILL') {
-        input2 = input3;
         if (차변) {
             AMT = parseFloat(input.amt);
         } else if (대변) {
@@ -264,7 +261,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_typ
                 '1000',               -- 회계단위
                 '0602',               -- 결의부서
                  NULL,                -- 작업자
-                '${차변 ? input.cd_acct : 대변 ? input2.cd_acct : '13500' }',   -- 계정과목
+                '${부가세 ? '13500' : input.cd_acct}',   -- 계정과목
                 '${차변 ? '3' : 대변 ? '4' : '3'}',         -- 차대구분 (차변 3, 대변 4, 부가세 3)
                 ${AMT},               -- 금액
                 '',                   -- 적요번호
