@@ -158,6 +158,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_typ
     let VAT = Math.round(AMT * vatRate);
 
     if (work_type === 'TAXBILL') {
+        input2 = input3;
         if (차변) {
             AMT = parseFloat(input.amt);
         } else if (대변) {
