@@ -122,6 +122,7 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
         await execDbInsert('차변', input, input2, maxInSq, maxLnSq, res);
         await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res);
     } else if (work_type === 'TAXBILL') {
+        input2 = input3;
         await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, res, work_type);
         await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, res, work_type);
         await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res, work_type);
@@ -157,6 +158,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_typ
 
     if (work_type === 'TAXBILL') {
         if (차변) {
+            input.acct = '15400'; // 원재료
             AMT = parseFloat(input.amt);
         } else if (대변) {
             AMT = parseFloat(input.amt) + VAT;
