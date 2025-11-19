@@ -103,6 +103,12 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
     if (input2.cd_acct === '15100') {
         input2.cd_acct = '14600';
     }
+
+    // 외화선급금일경우 input2가 비어서 옴, 대변을 input3으로 세팅
+    if (input1.cd_acct === '10302') {
+        input2 = input3;
+    }
+
     /*** 계정과목 NSR에 맞게 변환 ***/
 
     let maxInSq = await mssqlExec.mssqlExec(
