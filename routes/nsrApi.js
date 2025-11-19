@@ -158,7 +158,7 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_typ
 
     if (work_type === 'TAXBILL') {
         if (차변) {
-            input.acct = '15400'; // 원재료
+            input.cd_acct = '15400'; // 원재료
             AMT = parseFloat(input.amt);
         } else if (대변) {
             AMT = parseFloat(input.amt) + VAT;
