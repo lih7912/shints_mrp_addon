@@ -119,13 +119,13 @@ nsrApi.all('/insert_docu/:user_id/:work_type', async (req, res) => {
     let documentNo = `${today}-${String(maxInSq).padStart(5, '0')}-${String(maxLnSq).padStart(3, '0')}`;
 
     if (work_type === 'MATERIAL') {
-        await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, res);
-        await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, res);
+        await execDbInsert('차변', input, input2, maxInSq, maxLnSq, res);
         await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res);
     } else if (work_type === 'TAXBILL') {
         // NSR의 경우 부가세 항목없이 차변과 원화미지급금만 기록
         input2 = input3;
-        await execDbInsert('차변', input, input2, maxInSq, maxLnSq, res, work_type);
+        await execDbInsert('부가세', input, input2, maxInSq, maxLnSq, res, work_type);
+        await execDbInsert('차변', input, input2, maxInSq, ++maxLnSq, res, work_type);
         await execDbInsert('대변', input, input2, maxInSq, ++maxLnSq, res, work_type);
     }
 
@@ -155,19 +155,24 @@ async function execDbInsert(mode, input, input2, maxInSq, maxLnSq, res, work_typ
     let AMT = parseFloat(input.amt);  // 부가세 포함금액 (총액)
     let vatRate = 0.1;  // 부가세율 10%
 
-    if (work_type === 'TAXBILL') {
-        vatRate = 0;
-    }
     let VAT = Math.round(AMT * vatRate);
 
-    if (차변) {
-        AMT = parseFloat(input.amt);
-    } else if (대변) {
-        AMT = parseFloat(input.amt) + VAT;
-    } else if (부가세) {
-        AMT = VAT;
+    if (work_type === 'TAXBILL') {
+        if (차변) {
+            AMT = parseFloat(input.amt);
+        } else if (대변) {
+            AMT = parseFloat(input.amt) + VAT;
+        } else if (부가세) {
+            AMT = VAT;
+        }
+    } else {
+        if (차변) {
+            AMT = parseFloat(input.amt) + VAT;
+        } else if (대변) {
+            AMT = parseFloat(input.amt) + VAT;
+        } 
     }
-
+    
     try {
         let result = await mssqlExec.mssqlExec(
             `
